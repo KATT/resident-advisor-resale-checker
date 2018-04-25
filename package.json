@@ -10,6 +10,7 @@
   "license": "WTFPL",
   "homepage": "https://github.com/KATT/resident-advisor-resale-checker#readme",
   "dependencies": {
+    "cheerio": "^1.0.0-rc.2",
     "inquirer": "^5.2.0",
     "node-notifier": "^5.2.1",
     "request": "^2.85.0",
@@ -18,6 +19,7 @@
     "typescript": "^2.8.3"
   },
   "devDependencies": {
+    "@types/cheerio": "^0.22.7",
     "@types/inquirer": "0.0.41",
     "@types/node-notifier": "0.0.28",
     "@types/request-promise-native": "^1.0.14"

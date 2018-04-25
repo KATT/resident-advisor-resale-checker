@@ -1,6 +1,7 @@
 import * as request from 'request-promise-native';
-import { prompt } from 'inquirer';
+import { prompt, ChoiceType } from 'inquirer';
 import { notify } from 'node-notifier';
+import * as cheerio from 'cheerio';
 
 const questions = [
   {
@@ -22,20 +23,23 @@ function wait(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-async function check(url: string, interval: number, isFirst: boolean = false) {
+async function check(url: string, ids: string[], interval: number) {
   try {
-    console.time('loading');
+    console.time('fetched page in');
     const body = await request(url);
-    console.timeEnd('loading');
+    console.timeEnd('fetched page in');
 
-    if (body.includes('buynow')) {
-      notify({
-        title: 'TICKETS AVAILABLE!',
-        message: 'Tickets available!!',
-      });
-      console.log(`Tickets available! GO GO GO 👉  ${url}`);
+    const $ = cheerio.load(body);
+    for (const id of ids) {
+      const isAvailable = $(`[id='${id}']`).hasClass('onsale');
+
+      if (isAvailable) {
+        notify({
+          title: 'TICKETS AVAILABLE!',
+          message: id,
+        });
+      }
     }
-    console.log('Neup.');
   } catch (err) {
     console.log(err);
     notify({
@@ -44,21 +48,48 @@ async function check(url: string, interval: number, isFirst: boolean = false) {
     });
   }
 
-  setTimeout(() => {
-    check(url, interval);
-  }, interval);
+  await wait(interval);
+
+  check(url, ids, interval);
 }
 
 async function main() {
   const answers = await prompt(questions);
   const { interval, url } = answers as { [key: string]: string };
 
-  notify({
-    title: 'Starting crawler...',
-    message: JSON.stringify(answers),
+  const body = await request(url);
+
+  const $ = cheerio.load(body);
+  const $li = $('#tickets ul li');
+
+  const choices: ChoiceType[] = [];
+  $li.each((index, element) => {
+    const $el = $(element);
+    choices.push({
+      value: $el.attr('id'),
+      name: $el.text(),
+    });
   });
 
-  await check(url, parseInt(interval) * 1000, true);
+  const { selected } = (await prompt([
+    {
+      type: 'checkbox',
+      message: 'What tickets should we look out for?',
+      name: 'selected',
+      choices,
+    },
+  ])) as { selected: [string] };
+
+  notify({
+    title: 'Starting crawler...',
+    message: `Watching: ${selected.join(', ')}`,
+  });
+
+  console.log(`Started crawling, will check site every ${interval} seconds.`);
+  console.log(
+    "You should see a notification now. If you don't, something is wrong 😿.",
+  );
+  await check(url, selected, parseInt(interval) * 1000);
 }
 
 main();
