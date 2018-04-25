@@ -1,0 +1,25 @@
+{
+  "name": "resident-advisor-resale-checker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "ts-node index"
+  },
+  "author": "KATT",
+  "license": "WTFPL",
+  "homepage": "https://github.com/KATT/resident-advisor-resale-checker#readme",
+  "dependencies": {
+    "inquirer": "^5.2.0",
+    "node-notifier": "^5.2.1",
+    "request": "^2.85.0",
+    "request-promise-native": "^1.0.5",
+    "ts-node": "^6.0.0",
+    "typescript": "^2.8.3"
+  },
+  "devDependencies": {
+    "@types/inquirer": "0.0.41",
+    "@types/node-notifier": "0.0.28",
+    "@types/request-promise-native": "^1.0.14"
+  }
+}
