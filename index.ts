@@ -38,6 +38,8 @@ async function check(url: string, ids: string[], interval: number) {
           title: 'TICKETS AVAILABLE!',
           message: id,
         });
+
+        console.log(`${id} Tickets available! GO GO GO 👉  ${url}`);
       }
     }
   } catch (err) {
